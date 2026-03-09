@@ -1,64 +1,172 @@
+#include "SDL2/SDL_video.h"
 #include <SDL2/SDL.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-#define HEIGHT 900
-#define WIDTH 900
-#define TEXTURE 20
+#define HEIGHT 1080
+#define WIDTH 1800
 
-#define WHITE 0xffffffff
-#define OFF_WHITE 0xfaf9f6ff
-#define GRAY 0xff808080
+#define WHITE 0xFFFFFFFF
+#define OFF_WHITE 0xFFFAF9F6
+#define GRAY 0xFF808080
+#define BLACK 0xFF000000
+#define BLUE 0xff86c5d8
+#define YELLOW 0xfff1e86e
+#define PURPLE 0xffb194d1
+
+#define FPS_DELAY 50
+#define MAX_STARS 150
+
+#define BORDER_OFFSET 10
+#define BORDER_THICKNESS 3
+
+#define STAR_MIN_X (BORDER_OFFSET + BORDER_THICKNESS)
+#define STAR_MAX_X (WIDTH - BORDER_OFFSET - BORDER_THICKNESS)
+
+#define STAR_MIN_Y (BORDER_OFFSET + BORDER_THICKNESS)
+#define STAR_MAX_Y (HEIGHT - BORDER_OFFSET - BORDER_THICKNESS)
 
 static bool app_running = 1;
 
-void draw_border(SDL_Window *pwindow, SDL_Surface *psurface, Uint32 color) {
+typedef struct {
+  int x;
+  int y;
+  int life;
+  Uint32 color;
+} Star;
+
+Star stars[MAX_STARS];
+
+int rand_range(int min, int max) { return min + rand() % (max - min); }
+
+Uint32 random_star_color() {
+
+  int choice = rand() % 7;
+
+  switch (choice) {
+  case 0:
+    return WHITE;
+  case 1:
+    return OFF_WHITE;
+  case 2:
+    return GRAY;
+  case 3:
+    return BLACK;
+  case 4:
+    return BLUE;
+  case 5:
+    return YELLOW;
+  case 6:
+    return PURPLE;
+  default:
+    return WHITE;
+  }
+}
+
+void draw_border(SDL_Surface *psurface, Uint32 color) {
 
   SDL_Rect rect = {0, 0, 3, 3};
 
   // top
-  for (int x = 10; x < WIDTH - 10; x++) {
+  for (int x = BORDER_OFFSET; x < WIDTH - BORDER_OFFSET; x++) {
     rect.x = x;
-    rect.y = 10;
+    rect.y = BORDER_OFFSET;
     SDL_FillRect(psurface, &rect, color);
   }
 
   // bottom
-  for (int x = 10; x < WIDTH - 10; x++) {
+  for (int x = BORDER_OFFSET; x < WIDTH - BORDER_OFFSET; x++) {
     rect.x = x;
-    rect.y = HEIGHT - 10;
+    rect.y = HEIGHT - BORDER_OFFSET;
     SDL_FillRect(psurface, &rect, color);
   }
 
   // left
-  for (int y = 10; y < HEIGHT - 10; y++) {
-    rect.x = 10;
+  for (int y = BORDER_OFFSET; y < HEIGHT - BORDER_OFFSET; y++) {
+    rect.x = BORDER_OFFSET;
     rect.y = y;
     SDL_FillRect(psurface, &rect, color);
   }
 
   // right
-  for (int y = 10; y < HEIGHT - 10; y++) {
-    rect.x = WIDTH - 10;
+  for (int y = BORDER_OFFSET; y < HEIGHT - BORDER_OFFSET; y++) {
+    rect.x = WIDTH - BORDER_OFFSET;
     rect.y = y;
     SDL_FillRect(psurface, &rect, color);
   }
+}
 
-  SDL_UpdateWindowSurface(pwindow);
+void draw_star(SDL_Surface *surface, int x, int y, Uint32 color) {
+
+  SDL_Rect rect = {x, y, 3, 3};
+
+  // left
+  SDL_Rect rect1 = {x - 1, y + 1, 1, 1};
+
+  // right
+  SDL_Rect rect2 = {x + 3, y + 1, 1, 1};
+
+  // top
+  SDL_Rect rect3 = {x + 1, y - 1, 1, 1};
+
+  // bottom
+  SDL_Rect rect4 = {x + 1, y + 3, 1, 1};
+
+  SDL_FillRect(surface, &rect, color);
+  SDL_FillRect(surface, &rect1, color);
+  SDL_FillRect(surface, &rect2, color);
+  SDL_FillRect(surface, &rect3, color);
+  SDL_FillRect(surface, &rect4, color);
+}
+
+void init_stars() {
+  for (int i = 0; i < MAX_STARS; i++) {
+    stars[i].x = rand_range(STAR_MIN_X, STAR_MAX_X);
+    stars[i].y = rand_range(STAR_MIN_Y, STAR_MAX_Y);
+    stars[i].life = rand() % 200;
+    stars[i].color = random_star_color();
+  }
+}
+
+void update_stars(SDL_Surface *surface) {
+
+  for (int i = 0; i < MAX_STARS; i++) {
+
+    if (stars[i].life <= 0) {
+      stars[i].x = rand_range(STAR_MIN_X, STAR_MAX_X);
+      stars[i].y = rand_range(STAR_MIN_Y, STAR_MAX_Y);
+      stars[i].life = rand() % 200;
+      stars[i].color = random_star_color();
+    }
+
+    draw_star(surface, stars[i].x, stars[i].y, stars[i].color);
+    stars[i].life--;
+  }
 }
 
 int main(int argc, char *argv[]) {
 
-  int success = SDL_Init(SDL_INIT_VIDEO);
+  srand(time(NULL));
 
-  if (success != 0) {
-    printf("Failure - Init Failed");
-    exit(-1);
+  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    printf("Failure - Init Failed\n");
+    return -1;
   }
 
   SDL_Window *pwindow =
-      SDL_CreateWindow("raycast", SDL_WINDOWPOS_CENTERED,
-                       SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
+      SDL_CreateWindow("Stars", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                       WIDTH, HEIGHT, SDL_WINDOW_MAXIMIZED);
+
+  if (!pwindow) {
+    printf("Window creation failed\n");
+    return -1;
+  }
+
   SDL_Surface *psurface = SDL_GetWindowSurface(pwindow);
+
+  init_stars();
 
   while (app_running) {
 
@@ -66,16 +174,25 @@ int main(int argc, char *argv[]) {
 
     while (SDL_PollEvent(&event)) {
 
-      switch (event.type) {
-      case SDL_QUIT:
+      if (event.type == SDL_QUIT) {
         app_running = 0;
         printf("Quitting...\n");
-        break;
       }
     }
 
-    draw_border(pwindow, psurface, GRAY);
+    SDL_FillRect(psurface, NULL, BLACK);
+
+    update_stars(psurface);
+
+    draw_border(psurface, GRAY);
+
+    SDL_UpdateWindowSurface(pwindow);
+
+    SDL_Delay(FPS_DELAY);
   }
+
+  SDL_DestroyWindow(pwindow);
+  SDL_Quit();
 
   return 0;
 }
