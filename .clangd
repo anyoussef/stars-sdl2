@@ -1,0 +1,4 @@
+CompileFlags:
+  Add: [
+    "-I/nix/store/a1gcik4f5777g7yw2k2znjjmsadlgmcb-sdl2-compat-2.32.64-dev/include"
+  ]
