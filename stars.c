@@ -46,7 +46,7 @@ void draw_border(SDL_Window *pwindow, SDL_Surface *psurface, Uint32 color) {
   SDL_UpdateWindowSurface(pwindow);
 }
 
-int main(void) {
+int main(int argc, char *argv[]) {
 
   int success = SDL_Init(SDL_INIT_VIDEO);
 
