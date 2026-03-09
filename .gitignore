@@ -1,3 +1,4 @@
 .clangd
 /stars.dSYM/
 stars
+.DS_Store
