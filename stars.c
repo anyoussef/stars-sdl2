@@ -7,13 +7,6 @@
 
 static bool app_running = 1;
 
-typedef struct {
-  int x;
-  int y;
-  int life;
-  Uint32 color;
-} Star;
-
 Star stars[MAX_STARS];
 
 int rand_range(int min, int max) { return min + rand() % (max - min); }
