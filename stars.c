@@ -1,32 +1,9 @@
-#include "SDL2/SDL_video.h"
+#include "defs.h"
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-#define HEIGHT 1080
-#define WIDTH 1800
-
-#define WHITE 0xFFFFFFFF
-#define OFF_WHITE 0xFFFAF9F6
-#define GRAY 0xFF808080
-#define BLACK 0xFF000000
-#define BLUE 0xff86c5d8
-#define YELLOW 0xfff1e86e
-#define PURPLE 0xffb194d1
-
-#define FPS_DELAY 50
-#define MAX_STARS 150
-
-#define BORDER_OFFSET 10
-#define BORDER_THICKNESS 3
-
-#define STAR_MIN_X (BORDER_OFFSET + BORDER_THICKNESS)
-#define STAR_MAX_X (WIDTH - BORDER_OFFSET - BORDER_THICKNESS)
-
-#define STAR_MIN_Y (BORDER_OFFSET + BORDER_THICKNESS)
-#define STAR_MAX_Y (HEIGHT - BORDER_OFFSET - BORDER_THICKNESS)
 
 static bool app_running = 1;
 
@@ -165,7 +142,6 @@ int main(int argc, char *argv[]) {
   }
 
   SDL_Surface *psurface = SDL_GetWindowSurface(pwindow);
-
   init_stars();
 
   while (app_running) {
@@ -181,13 +157,9 @@ int main(int argc, char *argv[]) {
     }
 
     SDL_FillRect(psurface, NULL, BLACK);
-
     update_stars(psurface);
-
     draw_border(psurface, GRAY);
-
     SDL_UpdateWindowSurface(pwindow);
-
     SDL_Delay(FPS_DELAY);
   }
 
