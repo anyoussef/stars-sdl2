@@ -2,7 +2,6 @@
 #define STARS_H
 
 #include <SDL2/SDL.h>
-#include <stdbool.h>
 
 #define HEIGHT 1080
 #define WIDTH 1800
