@@ -16,7 +16,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libsdl2-dev build-essential
 
       - name: Compile
-        run: gcc main.c -lSDL2 -o stars
+        run: gcc -o stars stars.c `sdl2-config --cflags --libs`
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
