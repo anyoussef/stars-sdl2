@@ -9,18 +9,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-steps:
-  - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-  - name: Install SDL
-    run: sudo apt-get update && sudo apt-get install -y libsdl2-dev build-essential
+      - name: Install SDL
+        run: sudo apt-get update && sudo apt-get install -y libsdl2-dev build-essential
 
-  - name: Compile
-    run: gcc main.c -lSDL2 -o stars
+      - name: Compile
+        run: gcc main.c -lSDL2 -o stars
 
-  - name: Upload artifact
-    uses: actions/upload-artifact@v4
-    with:
-      name: stars
-      path: stars
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stars
+          path: stars
 
