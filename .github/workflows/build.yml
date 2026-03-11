@@ -1,0 +1,30 @@
+name: Build Stars Program
+
+on:
+push:
+branches: [ main ]
+pull_request:
+
+jobs:
+build:
+runs-on: ubuntu-latest
+
+```
+steps:
+  - name: Checkout repository
+    uses: actions/checkout@v4
+
+  - name: Install SDL2
+    run: |
+      sudo apt update
+      sudo apt install libsdl2-dev build-essential
+
+  - name: Compile program
+    run: |
+      gcc main.c -lSDL2 -o stars
+
+  - name: Upload executable
+    uses: actions/upload-artifact@v4
+    with:
+      name: stars-linux
+      path: stars
