@@ -1,5 +1,5 @@
 {
-  description = "raytracer dev shell";
+  description = "Stars SDL2 animation";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs";
 
@@ -9,12 +9,13 @@
       pkgs = import nixpkgs { inherit system; };
     in
     {
+      packages.${system}.default = pkgs.callPackage ./default.nix { };
+
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [
           gcc
           SDL2
         ];
-
         shellHook = ''
           exec zsh
         '';
